@@ -1,63 +1,33 @@
 package com.itmuch.redis.jdbc;
 
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Protocol;
 import redis.clients.jedis.util.SafeEncoder;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class JedisRedisClient implements RedisClient {
-    public static final Logger LOGGER = new Logger(JedisRedisClient.class);
-
-    private final Jedis jedis;
-
-    public JedisRedisClient(Jedis jedis) {
-        this.jedis = jedis;
-    }
+public abstract class AbstractRedisClient implements RedisClient {
+    public static final Logger LOGGER = new Logger(AbstractRedisClient.class);
 
     @Override
-    public synchronized String[] sendCommand(String sql) {
-        int db = this.jedis.getDB();
-
-        LOGGER.log("sendCommand('%s') on db %s", sql, db);
-
+    public String[] sendCommand(String sql) throws SQLException {
         try {
             Op op = Utils.parseSql(sql);
 
-            String commandString = op.getCommand();
-            String[] params = op.getParams();
+            Object result = this.sendCommand(op);
 
-            Protocol.Command command = this.convertCommand(commandString);
-
-            Object result;
-            if (params == null || params.length == 0) {
-                result = this.jedis.sendCommand(command);
-            } else {
-                result = this.jedis.sendCommand(command, params);
-            }
-            return this.decodeResult(sql, result);
+            return this.decodeResult(sql, result, op.getHints());
         } catch (Throwable e) {
-            LOGGER.log("command on db %s `%s` cannot execute.", db, sql);
-            throw new RuntimeException(String.format("command on db %s `%s` cannot execute.", db, sql));
+            throw new SQLException(e);
         }
     }
 
-    @Override
-    public synchronized void select(int dbIndex) {
-        this.jedis.select(dbIndex);
-    }
+    protected abstract Object sendCommand(Op op);
 
-    @Override
-    public synchronized void close() {
-        LOGGER.log("close()");
-        this.jedis.close();
-    }
-
-
-    private Protocol.Command convertCommand(String commandString) {
+    protected Protocol.Command convertCommand(String commandString) {
         return Arrays.stream(Protocol.Command.values())
                 .filter(t -> {
                     String string = t.toString();
@@ -69,7 +39,18 @@ public class JedisRedisClient implements RedisClient {
                 ));
     }
 
-    private String[] decodeResult(String sql, Object originResult) {
+
+    /**
+     * hint:
+     * -- decoder:jdk
+     * TODO
+     *
+     * @param sql
+     * @param originResult
+     * @param hints
+     * @return
+     */
+    protected String[] decodeResult(String sql, Object originResult, List<Hint> hints) {
         String[] decodedResult;
         if (originResult == null) {
             decodedResult = new String[]{null};

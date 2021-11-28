@@ -12,7 +12,7 @@ public class RedisTest {
     private final static Logger LOGGER = new Logger(RedisStatement.class);
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        Class.forName("com.itmuch.redis.jdbc.RedisDriver");
+        Class.forName("com.itmuch.redis.jdbc.redis.RedisDriver");
 
         Connection connection = DriverManager.getConnection("jdbc:redis://localhost:6379/0");
         Statement statement = connection.createStatement();

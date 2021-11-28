@@ -1,22 +1,17 @@
-package com.itmuch.redis.jdbc;
+package com.itmuch.redis.jdbc.redis;
 
+import com.itmuch.redis.jdbc.Logger;
+import com.itmuch.redis.jdbc.RedisConnection;
+import com.itmuch.redis.jdbc.conf.RedisConnectionInfo;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.*;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RedisDriver implements Driver {
     private final static Logger LOGGER = new Logger(RedisDriver.class);
 
     private static final String REDIS_JDBC_PREFIX = "jdbc:redis:";
-
-    private static final AtomicBoolean initialed = new AtomicBoolean(false);
-
-    JedisPool jp;
 
     static {
         try {
@@ -37,47 +32,37 @@ public class RedisDriver implements Driver {
             info = new Properties();
         }
 
-        // remove prefix so we can use URI parsing.
         String rawUrl = url.replaceFirst("jdbc:", "");
-        String host = "localhost";
-        int port = 3306;
-        int database = 0;
+        RedisConnectionInfo redisConnectionInfo = new RedisConnectionInfo(rawUrl, info);
+
+        String host = redisConnectionInfo.getHost();
+        int port = redisConnectionInfo.getPort();
+        int dbIndex = redisConnectionInfo.getDbIndex();
+        int timeout = redisConnectionInfo.getTimeout();
+        boolean ssl = redisConnectionInfo.isSsl();
+        String username = redisConnectionInfo.getUsername();
+        String password = redisConnectionInfo.getPassword();
+
         try {
-            URI uri = new URI(rawUrl);
-
-            host = uri.getHost() != null ? uri.getHost() : host;
-            port = uri.getPort() > 0 ? uri.getPort() : port;
-
-            String path = uri.getPath();
-            if (path != null && path.length() > 1) {
-                database = Integer.parseInt(path.replaceAll("/", ""));
-            }
-            // TODO 密码支持/超时时间支持
-            int timeout = 1000;
-            boolean ssl = false;
-            String user = null;
-            String password = null;
-
-
             final Jedis jedis = new Jedis(host, port, timeout, timeout, ssl);
             jedis.connect();
 
-            if (user != null) {
-                jedis.auth(user, password);
+            if (username != null) {
+                jedis.auth(username, password);
             } else if (password != null) {
                 jedis.auth(password);
             }
-            if (database != 0) {
-                jedis.select(database);
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
             }
 //            if (clientName != null) {
 //                jedis.clientSetname(clientName);
 //            }
 
-            return new RedisConnection(new JedisRedisClient(jedis), database + "", info);
-        } catch (URISyntaxException | NumberFormatException e) {
-            LOGGER.log("Cannot parse JDBC URL");
-            throw new SQLException("Cannot parse JDBC URL: " + url, e);
+            return new RedisConnection(new JedisRedisClient(jedis), dbIndex + "", info);
+        } catch (Exception e) {
+            LOGGER.log("Cannot init RedisConnection %s", e);
+            throw new SQLException("Cannot init RedisConnection", e);
         }
     }
 

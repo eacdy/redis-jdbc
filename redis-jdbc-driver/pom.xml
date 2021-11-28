@@ -29,4 +29,29 @@
             <artifactId>redis-jdbc-driver-core</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- https://maven.apache.org/plugins/maven-assembly-plugin/examples/single/using-container-descriptor-handlers.html -->
+            <!-- https://blog.csdn.net/yinni11/article/details/88747781-->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>assembly-zip.xml</descriptor>
+                        <descriptor>assembly-all.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
