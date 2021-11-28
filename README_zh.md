@@ -1,35 +1,32 @@
 # README
 
-It is a JDBC Driver for Redis which is based on Jedis.
+一个基于Jedis的Redis JDBC驱动。
 
-URL: 
+URL：
 * GitHub地址：https://github.com/eacdy/redis-jdbc
 * Gitee地址：https://gitee.com/itmuch/redis-jdbc
 
-## Features
-* Supports both single-node Redis and Redis Cluster.
-* Supports all the Redis Command that Jedis supports.
-* Support to connect Redis or Redis Cluster in Intellij IDEA database console.
-* Support all JDBC-based ORM frameworks(aka. Mybatis or Hibernate).
+
+## 特性
+* 支持单节点Redis与Redis Cluster
+* 支持所有Jedis支持的命令
+* 支持在Intellij IDEA database console中连接Redis
+* 支持基于JDBC的ORM框架，例如Mybatis、Hibernate等
 
 
-## How to use it? 
+## 使用
 
-Add the driver to your project:
+在项目中添加如下依赖：
 
 ```xml
- <dependency>
+<dependency>
     <groupId>com.itmuch.redis</groupId>
     <artifactId>redis-jdbc</artifactId>
     <version>0.0.1</version>
 </dependency>
 ```
 
-
-
-### For Redis
-
-Just use like below:
+### Redis
 
 ```java
 Class.forName("com.itmuch.redis.jdbc.redis.RedisDriver");
@@ -48,7 +45,7 @@ while (rs.next()) {
 }
 ```
 
-The properties can be like below:
+其中，properties中的key可如下表所示：
 
 | key      | defaultValue | description          |
 | -------- | ------------ | -------------------- |
@@ -59,9 +56,7 @@ The properties can be like below:
 
 
 
-### For Redis Cluster
-
-Just use like below:
+### Redis Cluster
 
 ```java
 Class.forName("com.itmuch.redis.jdbc.cluster.RedisClusterDriver");
@@ -80,7 +75,7 @@ while (rs.next()) {
 }
 ```
 
-The properties can be like below:
+其中，properties可如下表所示：
 
 | key         | defaultValue | description          |
 | ----------- | ------------ | -------------------- |
@@ -90,16 +85,3 @@ The properties can be like below:
 | timeout     | 1000         | Jedis timeout        |
 | maxAttempts | 5            | Jedis maxAttempts    |
 
-
-
-### For Redis Sentinel
-
-Not Support yet.
-
-
-
-
-
-## Thanks
-
-Jedis
