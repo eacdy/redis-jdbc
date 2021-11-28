@@ -1,5 +1,7 @@
 package com.itmuch.redis.jdbc;
 
+import com.itmuch.redis.jdbc.conf.Hint;
+import com.itmuch.redis.jdbc.conf.Op;
 import redis.clients.jedis.Protocol;
 import redis.clients.jedis.util.SafeEncoder;
 

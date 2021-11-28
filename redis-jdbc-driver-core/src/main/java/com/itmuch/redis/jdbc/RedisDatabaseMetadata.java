@@ -1,5 +1,7 @@
 package com.itmuch.redis.jdbc;
 
+import com.itmuch.redis.jdbc.conf.ServerVersion;
+
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.sql.*;

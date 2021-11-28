@@ -1,4 +1,4 @@
-package com.itmuch.redis.jdbc;
+package com.itmuch.redis.jdbc.conf;
 
 import java.util.Arrays;
 import java.util.Objects;

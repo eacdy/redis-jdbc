@@ -1,5 +1,6 @@
-package com.itmuch.redis.jdbc;
+package com.itmuch.redis.jdbc.conf;
 
+import com.itmuch.redis.jdbc.Utils;
 import lombok.Data;
 
 @Data

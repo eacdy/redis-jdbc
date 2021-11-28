@@ -1,5 +1,9 @@
 package com.itmuch.redis.jdbc;
 
+import com.itmuch.redis.jdbc.conf.Hint;
+import com.itmuch.redis.jdbc.conf.HintKey;
+import com.itmuch.redis.jdbc.conf.Op;
+
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.*;

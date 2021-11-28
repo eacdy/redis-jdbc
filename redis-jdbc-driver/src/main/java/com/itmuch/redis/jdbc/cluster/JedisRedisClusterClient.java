@@ -1,9 +1,9 @@
 package com.itmuch.redis.jdbc.cluster;
 
 import com.itmuch.redis.jdbc.AbstractRedisClient;
-import com.itmuch.redis.jdbc.Hint;
-import com.itmuch.redis.jdbc.HintKey;
-import com.itmuch.redis.jdbc.Op;
+import com.itmuch.redis.jdbc.conf.Hint;
+import com.itmuch.redis.jdbc.conf.HintKey;
+import com.itmuch.redis.jdbc.conf.Op;
 import lombok.RequiredArgsConstructor;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.Protocol;

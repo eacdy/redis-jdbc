@@ -2,7 +2,7 @@ package com.itmuch.redis.jdbc.redis;
 
 import com.itmuch.redis.jdbc.AbstractRedisClient;
 import com.itmuch.redis.jdbc.Logger;
-import com.itmuch.redis.jdbc.Op;
+import com.itmuch.redis.jdbc.conf.Op;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Protocol;
 

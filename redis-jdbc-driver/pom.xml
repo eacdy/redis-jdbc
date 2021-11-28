@@ -6,11 +6,11 @@
     <parent>
         <groupId>com.itmuch.redis</groupId>
         <artifactId>redis-jdbc</artifactId>
-        <version>0.0.1</version>
+        <version>0.0.2</version>
     </parent>
 
     <artifactId>redis-jdbc-driver</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <name>redis-jdbc-driver</name>
     <description>A JDBC Driver for Redis.</description>
     <url>https://www.itmuch.com</url>

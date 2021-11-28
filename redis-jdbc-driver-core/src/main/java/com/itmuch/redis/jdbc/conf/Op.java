@@ -1,4 +1,4 @@
-package com.itmuch.redis.jdbc;
+package com.itmuch.redis.jdbc.conf;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
