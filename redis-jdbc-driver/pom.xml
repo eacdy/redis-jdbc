@@ -6,13 +6,23 @@
     <parent>
         <groupId>com.itmuch.redis</groupId>
         <artifactId>redis-jdbc</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
     </parent>
 
     <artifactId>redis-jdbc-driver</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
+    <name>redis-jdbc-driver</name>
+    <description>A JDBC Driver for Redis.</description>
+    <url>https://www.itmuch.com</url>
 
     <dependencies>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.25</version>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

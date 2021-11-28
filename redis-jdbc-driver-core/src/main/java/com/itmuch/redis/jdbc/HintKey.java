@@ -14,9 +14,4 @@ public enum HintKey {
                 .findFirst()
                 .orElse(noop);
     }
-
-    public static void main(String[] args) {
-        HintKey decoder = fromString("decoder");
-        System.out.println(decoder);
-    }
 }

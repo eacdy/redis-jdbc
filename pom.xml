@@ -5,8 +5,11 @@
 
     <groupId>com.itmuch.redis</groupId>
     <artifactId>redis-jdbc</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>pom</packaging>
+    <name>redis-jdbc</name>
+    <description>A JDBC Driver for Redis.</description>
+    <url>https://www.itmuch.com</url>
 
     <modules>
         <module>redis-jdbc-driver</module>
@@ -52,7 +55,7 @@
             <dependency>
                 <groupId>com.itmuch.redis</groupId>
                 <artifactId>redis-jdbc-driver-core</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.0.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

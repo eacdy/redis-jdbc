@@ -1,1 +1,2 @@
 com.itmuch.redis.jdbc.redis.RedisDriver
+com.itmuch.redis.jdbc.cluster.RedisClusterDriver

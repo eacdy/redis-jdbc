@@ -2,7 +2,10 @@ package com.itmuch.redis.jdbc.conf;
 
 import com.itmuch.redis.jdbc.Logger;
 import com.itmuch.redis.jdbc.Utils;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import redis.clients.jedis.BinaryJedisCluster;
 import redis.clients.jedis.HostAndPort;
 
 import java.net.URI;
@@ -13,6 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class RedisClusterConnectionInfo extends BaseConnectionInfo {
     public static final Logger LOGGER = new Logger(RedisClusterConnectionInfo.class);
@@ -24,7 +28,7 @@ public class RedisClusterConnectionInfo extends BaseConnectionInfo {
         super((info));
         try {
             URI uri = new URI(rawUrl);
-            Object maxAttemptsString = info.getOrDefault("maxAttempts", "1");
+            Object maxAttemptsString = info.getOrDefault("maxAttempts", BinaryJedisCluster.DEFAULT_MAX_ATTEMPTS);
             int maxAttempts = Integer.parseInt(maxAttemptsString.toString());
 
             String query = uri.getQuery();

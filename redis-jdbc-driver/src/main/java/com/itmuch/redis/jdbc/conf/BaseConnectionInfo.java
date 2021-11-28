@@ -1,10 +1,12 @@
 package com.itmuch.redis.jdbc.conf;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Properties;
 
 @Data
+@NoArgsConstructor
 public class BaseConnectionInfo {
     protected String username;
     protected String password;
@@ -12,7 +14,7 @@ public class BaseConnectionInfo {
     protected int timeout;
 
     public BaseConnectionInfo(Properties info) {
-        String username = info.getProperty("username");
+        String username = info.getProperty("user");
         String password = info.getProperty("password");
         String sslString = info.getProperty("ssl");
         Object timeoutString = info.getOrDefault("timeout", "1000");

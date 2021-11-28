@@ -1,6 +1,7 @@
-package com.itmuch.redis.jdbc;
+package com.itmuch.redis.jdbc.cluster;
 
-import com.itmuch.redis.jdbc.cluster.JedisRedisClusterClient;
+import com.itmuch.redis.jdbc.Logger;
+import com.itmuch.redis.jdbc.RedisConnection;
 import com.itmuch.redis.jdbc.conf.RedisClusterConnectionInfo;
 import com.itmuch.redis.jdbc.redis.RedisDriver;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
