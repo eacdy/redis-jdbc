@@ -6,6 +6,7 @@ import redis.clients.jedis.Protocol;
 import redis.clients.jedis.util.SafeEncoder;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +18,7 @@ public abstract class AbstractRedisClient implements RedisClient {
     @Override
     public String[] sendCommand(String sql) throws SQLException {
         try {
-            Op op = Utils.parseSql(sql);
+            Op op = Utils.parseSql(sql, null);
 
             Object result = this.sendCommand(op);
 
@@ -41,7 +42,6 @@ public abstract class AbstractRedisClient implements RedisClient {
                 ));
     }
 
-
     /**
      * hint:
      * -- decoder:jdk
@@ -52,7 +52,7 @@ public abstract class AbstractRedisClient implements RedisClient {
      * @param hints
      * @return
      */
-    protected String[] decodeResult(String sql, Object originResult, List<Hint> hints) {
+    protected String[] decodeResult(String sql, Object originResult, List<Hint> hints) throws SQLException {
         String[] decodedResult;
         if (originResult == null) {
             decodedResult = new String[]{null};
@@ -60,13 +60,11 @@ public abstract class AbstractRedisClient implements RedisClient {
             String decoded = SafeEncoder.encode((byte[]) originResult);
             decodedResult = Stream.of(decoded)
                     .toArray(String[]::new);
-
         } else if (originResult instanceof Collection) {
-            List<?> list = (List<?>) originResult;
-            decodedResult = list.stream()
-                    .map(t -> SafeEncoder.encode((byte[]) t))
+            List<byte[]> convertedList = Utils.convert((Collection<?>) originResult, new ArrayList<>());
+            decodedResult = convertedList.stream()
+                    .map(SafeEncoder::encode)
                     .toArray(String[]::new);
-
         } else {
             LOGGER.log("cannot decode result. originResult = %s", originResult);
             decodedResult = Stream.of(originResult.toString())

@@ -2,7 +2,6 @@ package com.itmuch.redis.jdbc.cluster;
 
 import com.itmuch.redis.jdbc.AbstractRedisClient;
 import com.itmuch.redis.jdbc.conf.Hint;
-import com.itmuch.redis.jdbc.conf.HintKey;
 import com.itmuch.redis.jdbc.conf.Op;
 import lombok.RequiredArgsConstructor;
 import redis.clients.jedis.JedisCluster;
@@ -10,6 +9,7 @@ import redis.clients.jedis.Protocol;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 public class JedisRedisClusterClient extends AbstractRedisClient {
@@ -26,7 +26,7 @@ public class JedisRedisClusterClient extends AbstractRedisClient {
             Protocol.Command command = this.convertCommand(commandString);
 
             String sampleKey = hints.stream()
-                    .filter(hint -> hint.getKey().equals(HintKey.sample_key))
+                    .filter(hint -> Objects.equals(hint.getKey(), Hint.HINT_KEY_SAMPLE_KEY))
                     .findFirst()
                     .map(Hint::getValue)
                     .orElse(null);

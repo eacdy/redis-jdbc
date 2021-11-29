@@ -1,11 +1,11 @@
 package com.itmuch.redis.jdbc;
 
 import com.itmuch.redis.jdbc.conf.Hint;
-import com.itmuch.redis.jdbc.conf.HintKey;
 import com.itmuch.redis.jdbc.conf.Op;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,7 +31,11 @@ public class Utils {
                 .collect(Collectors.toList());
     }
 
-    public static Op parseSql(String rawSql) {
+    public static Op parseSql(String rawSql, Set<String> allowedHintKeys) {
+        if (allowedHintKeys == null || allowedHintKeys.size() == 0) {
+            allowedHintKeys = Hint.DEFAULT_ALLOWED_KEYS;
+        }
+
         // for IDEA database tool only
         if (rawSql.contains("SELECT 'keep alive'")) {
             return new Op(rawSql, null, "PING", new String[0]);
@@ -52,13 +56,18 @@ public class Utils {
             }
         });
 
+        Set<String> finalAllowedHintKeys = allowedHintKeys;
         List<Hint> hints = hintLines
                 .stream()
                 .map(line -> {
                     String hintStr = line.replace("--", "")
                             .replaceAll(" ", "");
                     String[] arr = hintStr.split(":");
-                    return new Hint(HintKey.fromString(arr[0]), arr[1]);
+
+                    boolean contains = finalAllowedHintKeys.contains(arr[0]);
+                    String hintKey = contains ? arr[0] : "noop";
+
+                    return new Hint(hintKey, arr[1]);
                 }).collect(Collectors.toList());
 
 
@@ -90,5 +99,29 @@ public class Utils {
             }
         }
         return map;
+    }
+
+    public static <E extends Enum<E>> E findEnum(final Class<E> enumClass, final String enumName) {
+        try {
+            return Enum.valueOf(enumClass, enumName);
+        } catch (final IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    public static List<byte[]> convert(Collection<?> collection, List<byte[]> list) throws SQLException {
+        for (Object t : collection) {
+            if (t == null) {
+                list.add(null);
+            } else if (t instanceof byte[]) {
+                list.add((byte[]) t);
+            } else if (t instanceof Collection) {
+                List<byte[]> decode = convert((Collection<?>) t, new ArrayList<>());
+                list.addAll(decode);
+            } else {
+                throw new SQLException("Cannot deserialize.");
+            }
+        }
+        return list;
     }
 }
