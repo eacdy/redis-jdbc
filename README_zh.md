@@ -3,16 +3,16 @@
 一个基于Jedis的Redis JDBC驱动。
 
 URL：
+
 * GitHub地址：https://github.com/eacdy/redis-jdbc
 * Gitee地址：https://gitee.com/itmuch/redis-jdbc
 
-
 ## 特性
+
 * 支持单节点Redis与Redis Cluster
 * 支持所有Jedis支持的命令
-* 支持在Intellij IDEA database console中连接Redis
+* 支持在Intellij IDEA database console中连接Redis。see: [如何在IntelliJ IDEA数据库控制台操作Redis](https://www.itmuch.com/other/redis-jdbc/)
 * 支持基于JDBC的ORM框架，例如Mybatis、Hibernate等
-
 
 ## 使用
 
@@ -54,8 +54,6 @@ while (rs.next()) {
 | ssl      | false        | whether to use ssl   |
 | timeout  | 1000         | Jedis timeout        |
 
-
-
 ### Redis Cluster
 
 ```java
@@ -84,4 +82,3 @@ while (rs.next()) {
 | ssl         | false        | whether to use ssl   |
 | timeout     | 1000         | Jedis timeout        |
 | maxAttempts | 5            | Jedis maxAttempts    |
-

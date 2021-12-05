@@ -3,17 +3,18 @@
 It is a JDBC Driver for Redis which is based on Jedis.
 
 URL: 
+
 * GitHub地址：https://github.com/eacdy/redis-jdbc
 * Gitee地址：https://gitee.com/itmuch/redis-jdbc
 
 ## Features
+
 * Supports both single-node Redis and Redis Cluster.
 * Supports all the Redis Command that Jedis supports.
-* Support to connect Redis or Redis Cluster in Intellij IDEA database console.
+* Support to connect Redis or Redis Cluster in Intellij IDEA database console. see: [如何在IntelliJ IDEA数据库控制台操作Redis](https://www.itmuch.com/other/redis-jdbc/)
 * Support all JDBC-based ORM frameworks(aka. Mybatis or Hibernate).
 
-
-## How to use it? 
+## How to use it?
 
 Add the driver to your project:
 
@@ -24,8 +25,6 @@ Add the driver to your project:
     <version>0.0.1</version>
 </dependency>
 ```
-
-
 
 ### For Redis
 
@@ -56,8 +55,6 @@ The properties can be like below:
 | password | null         | the password of user |
 | ssl      | false        | whether to use ssl   |
 | timeout  | 1000         | Jedis timeout        |
-
-
 
 ### For Redis Cluster
 
@@ -90,15 +87,9 @@ The properties can be like below:
 | timeout     | 1000         | Jedis timeout        |
 | maxAttempts | 5            | Jedis maxAttempts    |
 
-
-
 ### For Redis Sentinel
 
 Not Support yet.
-
-
-
-
 
 ## Thanks
 
