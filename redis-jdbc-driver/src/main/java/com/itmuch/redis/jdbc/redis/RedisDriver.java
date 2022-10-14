@@ -3,6 +3,7 @@ package com.itmuch.redis.jdbc.redis;
 import com.itmuch.redis.jdbc.Logger;
 import com.itmuch.redis.jdbc.RedisConnection;
 import com.itmuch.redis.jdbc.conf.RedisConnectionInfo;
+import java.util.Objects;
 import redis.clients.jedis.Jedis;
 
 import java.sql.*;
@@ -40,16 +41,16 @@ public class RedisDriver implements Driver {
         int dbIndex = redisConnectionInfo.getDbIndex();
         int timeout = redisConnectionInfo.getTimeout();
         boolean ssl = redisConnectionInfo.isSsl();
-        String username = redisConnectionInfo.getUsername();
-        String password = redisConnectionInfo.getPassword();
+        String username = Objects.toString(redisConnectionInfo.getUsername(), "").trim();
+        String password = Objects.toString(redisConnectionInfo.getPassword(), "").trim();
 
         try {
             final Jedis jedis = new Jedis(host, port, timeout, timeout, ssl);
             jedis.connect();
 
-            if (username != null) {
+            if (!username.isEmpty()) {
                 jedis.auth(username, password);
-            } else if (password != null) {
+            } else if (!password.isEmpty()) {
                 jedis.auth(password);
             }
             if (dbIndex != 0) {
