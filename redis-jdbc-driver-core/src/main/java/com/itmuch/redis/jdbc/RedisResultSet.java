@@ -304,8 +304,7 @@ public class RedisResultSet implements ResultSet {
 
     @Override
     public Object getObject(int columnIndex) throws SQLException {
-        LOGGER.log("getObject not implemented");
-        throw new SQLFeatureNotSupportedException("getObject not implemented");
+        return this.getString(columnIndex);
     }
 
     @Override
