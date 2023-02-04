@@ -1,5 +1,7 @@
 package com.itmuch.redis.jdbc.redis;
 
+import java.sql.SQLException;
+
 import com.itmuch.redis.jdbc.AbstractRedisClient;
 import com.itmuch.redis.jdbc.Logger;
 import com.itmuch.redis.jdbc.conf.Op;
@@ -11,8 +13,11 @@ public class JedisRedisClient extends AbstractRedisClient {
 
     private final Jedis jedis;
 
-    public JedisRedisClient(Jedis jedis) {
+    private int dbIndex;
+
+    public JedisRedisClient(Jedis jedis, int initialDbIndex) {
         this.jedis = jedis;
+        this.dbIndex = initialDbIndex;
     }
 
     @Override
@@ -42,6 +47,12 @@ public class JedisRedisClient extends AbstractRedisClient {
     @Override
     public synchronized void select(int dbIndex) {
         this.jedis.select(dbIndex);
+        this.dbIndex = dbIndex;
+    }
+
+    @Override
+    public int getDbIndex() throws SQLException {
+        return this.dbIndex;
     }
 
     @Override

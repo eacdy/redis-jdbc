@@ -51,7 +51,7 @@ public class RedisClusterDriver implements Driver {
         );
         JedisRedisClusterClient jedisRedisClusterClient = new JedisRedisClusterClient(jedisCluster);
 
-        return new RedisConnection(jedisRedisClusterClient, "0", info);
+        return new RedisConnection(jedisRedisClusterClient, info);
     }
 
     @Override

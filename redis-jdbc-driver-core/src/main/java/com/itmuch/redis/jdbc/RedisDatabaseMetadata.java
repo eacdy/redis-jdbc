@@ -11,9 +11,9 @@ public class RedisDatabaseMetadata implements DatabaseMetaData {
     private final static Logger LOGGER = new Logger(RedisDatabaseMetadata.class);
 
     private final RedisConnection connection;
-    private final String dbIndex;
+    private final int dbIndex;
 
-    public RedisDatabaseMetadata(RedisConnection connection, String dbIndex) {
+    public RedisDatabaseMetadata(RedisConnection connection, int dbIndex) {
         this.connection = connection;
         this.dbIndex = dbIndex;
     }
@@ -940,7 +940,7 @@ public class RedisDatabaseMetadata implements DatabaseMetaData {
             return this.getSchemas();
         }
 
-        schemaPattern = Utils.isNumber(schemaPattern) ? schemaPattern : dbIndex;
+        schemaPattern = Utils.isNumber(schemaPattern) ? schemaPattern : String.valueOf(dbIndex);
 
         return new RedisResultSet(new String[]{schemaPattern}, this.connection.createStatement());
     }

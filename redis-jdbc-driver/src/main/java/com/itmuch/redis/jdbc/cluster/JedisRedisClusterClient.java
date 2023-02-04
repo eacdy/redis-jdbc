@@ -50,6 +50,11 @@ public class JedisRedisClusterClient extends AbstractRedisClient {
     }
 
     @Override
+    public int getDbIndex() throws SQLException {
+        return 0;
+    }
+
+    @Override
     public void close() {
         this.jedisCluster.close();
     }

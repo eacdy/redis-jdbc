@@ -11,11 +11,8 @@ public class RedisConnection implements Connection {
     private final RedisClient redisClient;
     private final Properties properties;
 
-    private String dbIndex;
-
-    public RedisConnection(RedisClient redisClient, String dbIndex, Properties properties) {
+    public RedisConnection(RedisClient redisClient, Properties properties) {
         this.redisClient = redisClient;
-        this.dbIndex = dbIndex;
         this.properties = properties;
     }
 
@@ -82,7 +79,7 @@ public class RedisConnection implements Connection {
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        return new RedisDatabaseMetadata(this, this.dbIndex);
+        return new RedisDatabaseMetadata(this, redisClient.getDbIndex());
     }
 
     @Override
@@ -300,8 +297,6 @@ public class RedisConnection implements Connection {
             this.checkClosed();
 
             this.redisClient.select(Integer.parseInt(schema));
-
-            this.dbIndex = schema;
         }
     }
 
@@ -309,8 +304,9 @@ public class RedisConnection implements Connection {
     public String getSchema() throws SQLException {
         synchronized (RedisConnection.class) {
             this.checkClosed();
-            LOGGER.log("getSchema() = %s", this.dbIndex);
-            return this.dbIndex;
+            int dbIndex = redisClient.getDbIndex();
+            LOGGER.log("getSchema() = %s", dbIndex);
+            return String.valueOf(dbIndex);
         }
     }
 

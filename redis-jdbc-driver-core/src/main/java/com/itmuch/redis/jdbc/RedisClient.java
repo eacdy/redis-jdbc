@@ -7,5 +7,7 @@ public interface RedisClient {
 
     void select(int dbIndex) throws SQLException;
 
+    int getDbIndex() throws SQLException;
+
     void close();
 }

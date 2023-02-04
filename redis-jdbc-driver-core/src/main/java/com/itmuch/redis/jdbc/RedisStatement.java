@@ -114,11 +114,7 @@ public class RedisStatement implements Statement {
 
     @Override
     public boolean execute(String sql) throws SQLException {
-        this.checkClosed();
-
-        String[] result = this.redisClient.sendCommand(sql);
-        this.resultSet = new RedisResultSet(result, this);
-
+        this.resultSet = executeQuery(sql);
         return true;
     }
 

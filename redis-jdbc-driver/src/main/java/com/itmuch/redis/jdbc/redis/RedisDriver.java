@@ -59,7 +59,7 @@ public class RedisDriver implements Driver {
 //                jedis.clientSetname(clientName);
 //            }
 
-            return new RedisConnection(new JedisRedisClient(jedis), dbIndex + "", info);
+            return new RedisConnection(new JedisRedisClient(jedis, dbIndex), info);
         } catch (Exception e) {
             LOGGER.log("Cannot init RedisConnection %s", e);
             throw new SQLException("Cannot init RedisConnection", e);

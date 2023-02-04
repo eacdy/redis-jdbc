@@ -36,11 +36,6 @@ public class Utils {
             allowedHintKeys = Hint.DEFAULT_ALLOWED_KEYS;
         }
 
-        // for IDEA database tool only
-        if (rawSql.contains("SELECT 'keep alive'")) {
-            return new Op(rawSql, null, "PING", new String[0]);
-        }
-
         // hints
         List<String> lines = new BufferedReader(new StringReader(rawSql))
                 .lines()
@@ -77,7 +72,19 @@ public class Utils {
 
         String sql = sb.toString();
 
-        String[] arr = sql.split(" ");
+        String[] arr = sql.split("\\s(?=(([^\"]*\"){2})*[^\"]*$)\\s*");
+        for (int i=1; i<arr.length; i++) { //remove surrounding quotes
+            String arg = arr[i];
+            if (arg != null && arg.length() > 1) {
+                char start = arg.charAt(0);
+                char end = arg.charAt(arg.length()-1);
+                if (start == end) {
+                    if (start == '\'' || start == '"') {
+                        arr[i] = arg.substring(1, arg.length()-1);
+                    }
+                }
+            }
+        }
 
         String commandString = arr[0];
 
