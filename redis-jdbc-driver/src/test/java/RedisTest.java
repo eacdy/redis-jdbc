@@ -4,8 +4,14 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,9 +36,13 @@ public class RedisTest {
         statement.execute("FLUSHDB");
         statement.execute("SET a b");
         ResultSet rs = statement.executeQuery("DBSIZE");
+        rs.getMetaData().getColumnClassName(1);
         logResult(rs, "DB size");
         rs = statement.executeQuery("get a");
         logResult(rs, "Get result");
+
+        rs = statement.executeQuery("TTL a");
+        logResult(rs, "TTL result");
 
 //        statement.execute("set a b");
 //        ResultSet rs = statement.executeQuery("get a");
@@ -46,6 +56,13 @@ public class RedisTest {
         connection.setSchema("11");
         ResultSet resultSet2 = statement.executeQuery("set ab99 ab88");
         logResult(resultSet, "set result");
+
+        statement.execute("HMSET hash field1 value1 field2 value2");
+        rs = statement.executeQuery("HGET hash field1");
+        logResult(rs, "HGET result");
+        rs = statement.executeQuery("HGETALL hash");
+        logResult(rs, "HGETALL result");
+
 
         resultSet.close();
         statement.close();
@@ -73,10 +90,15 @@ public class RedisTest {
     }
 
     public static void logResult(ResultSet rs, String formattedMsg) throws SQLException {
-       int i = 0;
+       int row = 0;
+       ResultSetMetaData metadata = rs.getMetaData();
        while (rs.next()) {
-           LOGGER.log(formattedMsg + "[" + i +"]=%s", rs.getString(1));
-           i++;
+           Map<String, Object> values = new LinkedHashMap<>();
+           for (int i = 1; i <= metadata.getColumnCount(); i++) {
+               values.put(metadata.getColumnName(i), rs.getObject(i));
+           }
+           LOGGER.log(formattedMsg + "[" + row +"]=%s", values);
+           row++;
        }
     }
 }

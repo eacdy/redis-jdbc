@@ -2,6 +2,8 @@ package com.itmuch.redis.jdbc;
 
 import java.sql.*;
 
+import com.itmuch.redis.jdbc.conf.Op;
+
 public class RedisStatement implements Statement {
     private final static Logger LOGGER = new Logger(RedisStatement.class);
 
@@ -23,8 +25,18 @@ public class RedisStatement implements Statement {
 
         this.checkClosed();
 
+        Op op = Utils.parseSql(sql, null);
+        ColumnConverter converter = ColumnConverter.COMMAND_CONVERTERS.get(op.getCommand());
+        HashResultConverter hashConverter = HashResultConverter.COMMAND_CONVERTERS.get(op.getCommand());
+
         String[] result = this.redisClient.sendCommand(sql);
-        return new RedisResultSet(result, this);
+        if (converter != null) {
+            return new RedisResultSet(result, this, op.getParams(), converter);
+        } else if (hashConverter != null) {
+          return new HashRedisResultSet(result, this, op.getParams(), hashConverter);
+        } else {
+            return new RedisResultSet(result, this);
+        }
     }
 
 

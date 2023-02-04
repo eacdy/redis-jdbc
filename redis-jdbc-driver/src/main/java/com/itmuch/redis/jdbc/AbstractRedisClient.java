@@ -74,7 +74,7 @@ public abstract class AbstractRedisClient implements RedisClient {
         } else if (originResult instanceof Collection) {
             List<byte[]> convertedList = Utils.convert((Collection<?>) originResult, new ArrayList<>());
             decodedResult = convertedList.stream()
-                    .map(SafeEncoder::encode)
+                    .map(AbstractRedisClient::nullSafeEncode)
                     .toArray(String[]::new);
         } else {
             LOGGER.log("cannot decode result. originResult = %s", originResult);
@@ -84,5 +84,9 @@ public abstract class AbstractRedisClient implements RedisClient {
         LOGGER.log("decode success. sql = %s, originResult = %s, decodedResult = %s",
                 sql, originResult, Utils.toList(decodedResult));
         return decodedResult;
+    }
+
+    private static String nullSafeEncode(byte[] bytes) {
+        return bytes == null ? null : SafeEncoder.encode(bytes);
     }
 }

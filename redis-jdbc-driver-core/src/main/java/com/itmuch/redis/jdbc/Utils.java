@@ -31,6 +31,25 @@ public class Utils {
                 .collect(Collectors.toList());
     }
 
+    public static Map imapOf(Object... kv) {
+        return Collections.unmodifiableMap(mapOf(kv));
+    }
+
+    public static Map mapOf(Object... kv) {
+        if (kv.length % 2 != 0) {
+            throw new IllegalArgumentException("Key-value pairs must be even");
+        }
+        Map map = new LinkedHashMap();
+        for (int i = 0; i < kv.length; i++) {
+            if (i %2 ==0) {
+                Object k = kv[i];
+                Object v = kv[i+1];
+                map.put(k, v);
+            }
+        }
+        return map;
+    }
+
     public static Op parseSql(String rawSql, Set<String> allowedHintKeys) {
         if (allowedHintKeys == null || allowedHintKeys.size() == 0) {
             allowedHintKeys = Hint.DEFAULT_ALLOWED_KEYS;
@@ -86,7 +105,7 @@ public class Utils {
             }
         }
 
-        String commandString = arr[0];
+        String commandString = arr[0].toUpperCase();
 
         if (arr.length == 1) {
             return new Op(rawSql, hints, commandString, new String[0]);
