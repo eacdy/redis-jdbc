@@ -27,9 +27,8 @@ public class RedisConnection implements Connection {
 
     @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
-        // TODO 暂不实现，感觉意义不大，未来看是否需要实现
-        LOGGER.log("prepareStatement not implemented");
-        throw new SQLFeatureNotSupportedException("prepareStatement not implemented");
+        this.checkClosed();
+        return new RedisPreparedStatement(sql, this, this.redisClient);
     }
 
     @Override
@@ -79,7 +78,7 @@ public class RedisConnection implements Connection {
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        return new RedisDatabaseMetadata(this, redisClient.getDbIndex());
+        return new RedisDatabaseMetadata(this, redisClient.getDbIndex(), redisClient.hasMultiDb());
     }
 
     @Override

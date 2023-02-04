@@ -10,4 +10,8 @@ public interface RedisClient {
     int getDbIndex() throws SQLException;
 
     void close();
+
+    default boolean hasMultiDb() {
+        return true;
+    }
 }

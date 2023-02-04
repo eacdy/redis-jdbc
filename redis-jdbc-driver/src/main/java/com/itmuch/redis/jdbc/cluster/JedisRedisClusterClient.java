@@ -55,6 +55,11 @@ public class JedisRedisClusterClient extends AbstractRedisClient {
     }
 
     @Override
+    public boolean hasMultiDb() {
+        return false;
+    }
+
+    @Override
     public void close() {
         this.jedisCluster.close();
     }

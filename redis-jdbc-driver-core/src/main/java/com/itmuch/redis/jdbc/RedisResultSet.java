@@ -21,6 +21,7 @@ import java.sql.SQLXML;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -122,6 +123,9 @@ public class RedisResultSet implements ResultSet {
     @Override
     public String getString(int columnIndex) throws SQLException {
         LOGGER.log("getString(%s)", columnIndex);
+        if (columnIndex == -1) {
+            new RuntimeException(String.format("Results=%s, index=%s", Arrays.asList(result), columnIndex)).printStackTrace();
+        }
         return getColumnIndexWithDefault(columnIndex, null, String::toString);
     }
 
@@ -332,7 +336,7 @@ public class RedisResultSet implements ResultSet {
 
     @Override
     public int findColumn(String columnLabel) throws SQLException {
-        return columnIndexes.getOrDefault(columnLabel, -1);
+        return columnIndexes.getOrDefault(columnLabel, 1);
     }
 
     @Override

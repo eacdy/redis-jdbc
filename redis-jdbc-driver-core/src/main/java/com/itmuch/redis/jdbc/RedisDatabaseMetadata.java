@@ -13,9 +13,12 @@ public class RedisDatabaseMetadata implements DatabaseMetaData {
     private final RedisConnection connection;
     private final int dbIndex;
 
-    public RedisDatabaseMetadata(RedisConnection connection, int dbIndex) {
+    private boolean hasMultipleDb;
+
+    public RedisDatabaseMetadata(RedisConnection connection, int dbIndex, boolean hasMultipleDb) {
         this.connection = connection;
         this.dbIndex = dbIndex;
+        this.hasMultipleDb = hasMultipleDb;
     }
 
     @Override
@@ -662,9 +665,14 @@ public class RedisDatabaseMetadata implements DatabaseMetaData {
         ResultSet rs;
         Statement statement = connection.createStatement();
 
-        String[] databases = IntStream.range(0, 16)
-                .mapToObj(i -> i + "")
-                .toArray(String[]::new);
+        String[] databases;
+        if (hasMultipleDb) {
+            databases = IntStream.range(0, 16)
+                                          .mapToObj(i -> i + "")
+                                          .toArray(String[]::new);
+        } else {
+            databases = new String[]{"0"};
+        }
         rs = new RedisResultSet(databases, statement);
         return rs;
     }
