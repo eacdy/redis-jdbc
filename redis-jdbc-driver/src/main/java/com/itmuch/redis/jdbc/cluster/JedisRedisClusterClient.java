@@ -1,19 +1,25 @@
 package com.itmuch.redis.jdbc.cluster;
 
 import com.itmuch.redis.jdbc.AbstractRedisClient;
+import com.itmuch.redis.jdbc.conf.Feature;
 import com.itmuch.redis.jdbc.conf.Hint;
 import com.itmuch.redis.jdbc.conf.Op;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.Protocol;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @RequiredArgsConstructor
 public class JedisRedisClusterClient extends AbstractRedisClient {
     private final JedisCluster jedisCluster;
+
+    @Getter
+    private final Map<Feature, Boolean> featureMap;
 
     @Override
     protected Object sendCommand(Op op) {

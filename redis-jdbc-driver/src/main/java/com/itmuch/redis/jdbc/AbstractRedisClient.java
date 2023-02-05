@@ -1,5 +1,6 @@
 package com.itmuch.redis.jdbc;
 
+import com.itmuch.redis.jdbc.conf.Feature;
 import com.itmuch.redis.jdbc.conf.Hint;
 import com.itmuch.redis.jdbc.conf.Op;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public abstract class AbstractRedisClient implements RedisClient {
@@ -24,7 +26,7 @@ public abstract class AbstractRedisClient implements RedisClient {
             String firstParam = op.getParams().length == 0 ? null : op.getParams()[0];
             if (op.getCommand().equals("USE") && firstParam != null) { //DB switch
                 select(Integer.valueOf(op.getParams()[0]));
-                return new String[]{"DB switched to " + op.getParams()[0]};
+                return new String[]{op.getParams()[0]};
             } else if (op.getCommand().equals("SELECT") && StringUtils.equalsIgnoreCase(firstParam, "DB_NAME()")) {
                 return new String[]{String.valueOf(this.getDbIndex())};
             } else if (op.getCommand().equals("SELECT") && StringUtils.equalsIgnoreCase(firstParam, "keep_alive")) { // for IDEA database tool only

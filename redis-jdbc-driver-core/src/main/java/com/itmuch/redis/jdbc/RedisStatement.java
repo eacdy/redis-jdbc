@@ -2,6 +2,7 @@ package com.itmuch.redis.jdbc;
 
 import java.sql.*;
 
+import com.itmuch.redis.jdbc.conf.Feature;
 import com.itmuch.redis.jdbc.conf.Op;
 
 public class RedisStatement implements Statement {
@@ -30,9 +31,9 @@ public class RedisStatement implements Statement {
         HashResultConverter hashConverter = HashResultConverter.COMMAND_CONVERTERS.get(op.getCommand());
 
         String[] result = this.redisClient.sendCommand(sql);
-        if (converter != null) {
+        if (converter != null && redisClient.getFeatureMap().get(Feature.EXTRA_COLUMN_CONVERSIONS)) {
             return new RedisResultSet(result, this, op.getParams(), converter);
-        } else if (hashConverter != null) {
+        } else if (hashConverter != null && redisClient.getFeatureMap().get(Feature.HASH_RESULT_CONVERSIONS)) {
           return new HashRedisResultSet(result, this, op.getParams(), hashConverter);
         } else {
             return new RedisResultSet(result, this);

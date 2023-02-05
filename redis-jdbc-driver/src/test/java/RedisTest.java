@@ -8,11 +8,14 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.IntStream;
 
+import com.itmuch.redis.jdbc.conf.Feature;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +27,10 @@ public class RedisTest {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         Class.forName("com.itmuch.redis.jdbc.redis.RedisDriver");
 
-        Connection connection = DriverManager.getConnection("jdbc:redis://localhost:6379/0");
+        Properties props = new Properties();
+        Arrays.stream(Feature.values()).forEach(f -> props.put(f.getPropName(), true));
+        Connection connection = DriverManager.getConnection("jdbc:redis://localhost:6379/0",
+                                                            props);
         Statement statement = connection.createStatement();
 
         LOGGER.log("Initial schema is %s", connection.getSchema());
@@ -34,7 +40,7 @@ public class RedisTest {
         LOGGER.log("Test schema is %s", connection.getSchema());
 
         statement.execute("FLUSHDB");
-        statement.execute("SET a b");
+        statement.execute("SET 'a' \"b\"");
         ResultSet rs = statement.executeQuery("DBSIZE");
         rs.getMetaData().getColumnClassName(1);
         logResult(rs, "DB size");
@@ -43,6 +49,8 @@ public class RedisTest {
 
         rs = statement.executeQuery("TTL a");
         logResult(rs, "TTL result");
+
+
 
 //        statement.execute("set a b");
 //        ResultSet rs = statement.executeQuery("get a");

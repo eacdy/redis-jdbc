@@ -1,16 +1,23 @@
 package com.itmuch.redis.jdbc.cluster;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.DriverPropertyInfo;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.Map;
+import java.util.Properties;
+
 import com.itmuch.redis.jdbc.Logger;
 import com.itmuch.redis.jdbc.RedisConnection;
+import com.itmuch.redis.jdbc.conf.Feature;
 import com.itmuch.redis.jdbc.conf.RedisClusterConnectionInfo;
 import com.itmuch.redis.jdbc.redis.RedisDriver;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import redis.clients.jedis.JedisCluster;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.*;
-import java.util.Properties;
 
 public class RedisClusterDriver implements Driver {
     private final static Logger LOGGER = new Logger(RedisDriver.class);
@@ -49,7 +56,7 @@ public class RedisClusterDriver implements Driver {
                 null,
                 new GenericObjectPoolConfig<>()
         );
-        JedisRedisClusterClient jedisRedisClusterClient = new JedisRedisClusterClient(jedisCluster);
+        JedisRedisClusterClient jedisRedisClusterClient = new JedisRedisClusterClient(jedisCluster, Feature.fromProperties(info));
 
         return new RedisConnection(jedisRedisClusterClient, info);
     }
@@ -61,7 +68,10 @@ public class RedisClusterDriver implements Driver {
 
     @Override
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
-        return new DriverPropertyInfo[0];
+        Map<Feature, Boolean> settings = Feature.fromProperties(info);
+        return settings.entrySet().stream().map(entry -> {
+            return new DriverPropertyInfo(entry.getKey().getPropName(), entry.getValue().toString());
+        }).toArray(DriverPropertyInfo[]::new);
     }
 
     @Override

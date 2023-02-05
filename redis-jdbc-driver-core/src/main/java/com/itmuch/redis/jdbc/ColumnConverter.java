@@ -2,6 +2,7 @@ package com.itmuch.redis.jdbc;
 
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -24,12 +25,7 @@ public class ColumnConverter<R> {
            .targetType(Timestamp.class)
            .columnTypeName(Types.TIMESTAMP)
            .converter(str -> {
-               Long number = Long.parseLong(str);
-               if (number == -1 || number == -2) {
-                   return null;
-               }
-               LocalDateTime ldt = LocalDateTime.now().plus(number, ChronoUnit.SECONDS).truncatedTo(ChronoUnit.SECONDS);
-               return Timestamp.valueOf(ldt);
+               return ttlConvert(str, System.currentTimeMillis(), ChronoUnit.SECONDS);
            })
            .build();
 
@@ -38,18 +34,23 @@ public class ColumnConverter<R> {
             .targetType(Timestamp.class)
             .columnTypeName(Types.TIMESTAMP)
             .converter(str -> {
-                Long number = Long.parseLong(str);
-                if (number == -1 || number == -2) {
-                    return null;
-                }
-                LocalDateTime ldt = LocalDateTime.now().plus(number, ChronoUnit.MILLIS).truncatedTo(ChronoUnit.SECONDS);
-                return Timestamp.valueOf(ldt);
+                return ttlConvert(str, System.currentTimeMillis(), ChronoUnit.MILLIS);
+            })
+            .build();
+
+    public static final ColumnConverter EXPIRETIME_CONVERTER = ColumnConverter.<Timestamp>builder()
+            .columnName("TIMESTAMP")
+            .targetType(Timestamp.class)
+            .columnTypeName(Types.TIMESTAMP)
+            .converter(str -> {
+                return ttlConvert(str, 0L, ChronoUnit.MILLIS);
             })
             .build();
 
     protected static final Map<String, ColumnConverter> COMMAND_CONVERTERS = Utils.imapOf(
             "TTL", TTL_CONVERTER,
-            "PTTL", PTTL_CONVERTER
+            "PTTL", PTTL_CONVERTER,
+            "EXPIRETIME", EXPIRETIME_CONVERTER
                                                                                          );
 
     Function<String, R> converter;
@@ -67,6 +68,15 @@ public class ColumnConverter<R> {
             inputAwareConverter = ((String value, String[] args) -> this.converter.apply(value));
         }
         return inputAwareConverter;
+    }
+
+    private static Timestamp ttlConvert(String source, long fromEpoch, ChronoUnit unit) {
+        Long num = Long.parseLong(source);
+        if (num == -1 || num == -2) {
+            return null;
+        }
+        Instant inst = Instant.ofEpochMilli(fromEpoch).plus(num, unit).truncatedTo(ChronoUnit.SECONDS);
+        return Timestamp.from(inst);
     }
 
 }
