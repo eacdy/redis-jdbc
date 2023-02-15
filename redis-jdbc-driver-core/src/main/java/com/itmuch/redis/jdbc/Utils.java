@@ -31,14 +31,28 @@ public class Utils {
                 .collect(Collectors.toList());
     }
 
+    public static Map imapOf(Object... kv) {
+        return Collections.unmodifiableMap(mapOf(kv));
+    }
+
+    public static Map mapOf(Object... kv) {
+        if (kv.length % 2 != 0) {
+            throw new IllegalArgumentException("Key-value pairs must be even");
+        }
+        Map map = new LinkedHashMap();
+        for (int i = 0; i < kv.length; i++) {
+            if (i %2 ==0) {
+                Object k = kv[i];
+                Object v = kv[i+1];
+                map.put(k, v);
+            }
+        }
+        return map;
+    }
+
     public static Op parseSql(String rawSql, Set<String> allowedHintKeys) {
         if (allowedHintKeys == null || allowedHintKeys.size() == 0) {
             allowedHintKeys = Hint.DEFAULT_ALLOWED_KEYS;
-        }
-
-        // for IDEA database tool only
-        if (rawSql.contains("SELECT 'keep alive'")) {
-            return new Op(rawSql, null, "PING", new String[0]);
         }
 
         // hints
@@ -77,9 +91,21 @@ public class Utils {
 
         String sql = sb.toString();
 
-        String[] arr = sql.split(" ");
+        String[] arr = sql.split("\\s(?=(([^\"]*\"){2})*[^\"]*$)\\s*");
+        for (int i=1; i<arr.length; i++) { //remove surrounding quotes
+            String arg = arr[i];
+            if (arg != null && arg.length() > 1) {
+                char start = arg.charAt(0);
+                char end = arg.charAt(arg.length()-1);
+                if (start == end) {
+                    if (start == '\'' || start == '"') {
+                        arr[i] = arg.substring(1, arg.length()-1);
+                    }
+                }
+            }
+        }
 
-        String commandString = arr[0];
+        String commandString = arr[0].toUpperCase();
 
         if (arr.length == 1) {
             return new Op(rawSql, hints, commandString, new String[0]);

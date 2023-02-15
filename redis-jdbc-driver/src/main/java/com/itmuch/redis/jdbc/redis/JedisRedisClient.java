@@ -1,8 +1,13 @@
 package com.itmuch.redis.jdbc.redis;
 
+import java.sql.SQLException;
+import java.util.Map;
+
 import com.itmuch.redis.jdbc.AbstractRedisClient;
 import com.itmuch.redis.jdbc.Logger;
+import com.itmuch.redis.jdbc.conf.Feature;
 import com.itmuch.redis.jdbc.conf.Op;
+import lombok.Getter;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Protocol;
 
@@ -11,8 +16,15 @@ public class JedisRedisClient extends AbstractRedisClient {
 
     private final Jedis jedis;
 
-    public JedisRedisClient(Jedis jedis) {
+    private int dbIndex;
+
+    @Getter
+    private final Map<Feature, Boolean> featureMap;
+
+    public JedisRedisClient(Jedis jedis, int initialDbIndex, Map<Feature, Boolean> featureMap) {
         this.jedis = jedis;
+        this.dbIndex = initialDbIndex;
+        this.featureMap = featureMap;
     }
 
     @Override
@@ -42,6 +54,12 @@ public class JedisRedisClient extends AbstractRedisClient {
     @Override
     public synchronized void select(int dbIndex) {
         this.jedis.select(dbIndex);
+        this.dbIndex = dbIndex;
+    }
+
+    @Override
+    public int getDbIndex() throws SQLException {
+        return this.dbIndex;
     }
 
     @Override

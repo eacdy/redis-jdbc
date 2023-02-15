@@ -3,39 +3,23 @@ package com.itmuch.redis.jdbc;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class RedisResultSetMetaData implements ResultSetMetaData {
-    private final static Logger LOGGER = new Logger(RedisResultSetMetaData.class);
+public class HashRedisResultSetMetaData extends RedisResultSetMetaData {
+    private final static Logger LOGGER = new Logger(HashRedisResultSetMetaData.class);
 
-    public static final int MAX_SIZE = 1024;
+    private final List<String> columnNames;
 
-    private final Map<Integer, ColumnConverter> columnConverterMap;
-
-
-    public RedisResultSetMetaData(Map<Integer, ColumnConverter> columnConverterMap) {
-        this.columnConverterMap = columnConverterMap;
-    }
-
-    @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        try {
-            return iface.cast(this);
-        } catch (ClassCastException cce) {
-            LOGGER.log("Unable to unwrap to %s", iface);
-            throw new SQLException("Unable to unwrap to " + iface);
-        }
-    }
-
-    @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return iface.isInstance(this);
+    public HashRedisResultSetMetaData(List<String> columnNames) {
+        super(null);
+        this.columnNames = columnNames;
     }
 
     @Override
     public int getColumnCount() throws SQLException {
-        return columnConverterMap.size();
+        return columnNames.size();
     }
 
     @Override
@@ -69,29 +53,19 @@ public class RedisResultSetMetaData implements ResultSetMetaData {
     }
 
     @Override
-    public int getColumnDisplaySize(int column) throws SQLException {
-        return MAX_SIZE;
-    }
-
-    @Override
     public String getColumnLabel(int column) throws SQLException {
         return getColumnName(column);
     }
 
     @Override
     public String getColumnName(int column) throws SQLException {
-        return getFromColumnConverter(column, "RESULTS", ColumnConverter::getColumnName);
+        return columnNames.get(column-1);
     }
 
     @Override
     public String getSchemaName(int column) throws SQLException {
         LOGGER.log("getSchemaName(%s)", column);
         return "9";
-    }
-
-    @Override
-    public int getPrecision(int column) throws SQLException {
-        return MAX_SIZE;
     }
 
     @Override
@@ -111,12 +85,12 @@ public class RedisResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public int getColumnType(int column) throws SQLException {
-        return getFromColumnConverter(column, Types.NVARCHAR, c -> c.getColumnTypeName());
+        return Types.NVARCHAR;
     }
 
     @Override
     public String getColumnTypeName(int column) throws SQLException {
-        return getFromColumnConverter(column, "String", c -> c.getTargetType().getSimpleName());
+        return "String";
     }
 
     @Override
@@ -136,15 +110,7 @@ public class RedisResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public String getColumnClassName(int column) throws SQLException {
-        return getFromColumnConverter(column, "java.lang.String", c -> c.getTargetType().getName());
-    }
-
-    private <T> T getFromColumnConverter(int column, T nullDefault, Function<ColumnConverter, T> getter) {
-        if (column > columnConverterMap.size() + 1) {
-            throw new IllegalArgumentException("Invalid column index " + column);
-        }
-        ColumnConverter cc = columnConverterMap.get(column);
-        return cc == null ? nullDefault : getter.apply(cc);
+        return "java.lang.String";
     }
 
 }

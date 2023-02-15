@@ -2,6 +2,9 @@ package com.itmuch.redis.jdbc;
 
 import java.sql.*;
 
+import com.itmuch.redis.jdbc.conf.Feature;
+import com.itmuch.redis.jdbc.conf.Op;
+
 public class RedisStatement implements Statement {
     private final static Logger LOGGER = new Logger(RedisStatement.class);
 
@@ -23,8 +26,18 @@ public class RedisStatement implements Statement {
 
         this.checkClosed();
 
+        Op op = Utils.parseSql(sql, null);
+        ColumnConverter converter = ColumnConverter.COMMAND_CONVERTERS.get(op.getCommand());
+        HashResultConverter hashConverter = HashResultConverter.COMMAND_CONVERTERS.get(op.getCommand());
+
         String[] result = this.redisClient.sendCommand(sql);
-        return new RedisResultSet(result, this);
+        if (converter != null && redisClient.getFeatureMap().get(Feature.EXTRA_COLUMN_CONVERSIONS)) {
+            return new RedisResultSet(result, this, op.getParams(), converter);
+        } else if (hashConverter != null && redisClient.getFeatureMap().get(Feature.HASH_RESULT_CONVERSIONS)) {
+          return new HashRedisResultSet(result, this, op.getParams(), hashConverter);
+        } else {
+            return new RedisResultSet(result, this);
+        }
     }
 
 
@@ -114,11 +127,7 @@ public class RedisStatement implements Statement {
 
     @Override
     public boolean execute(String sql) throws SQLException {
-        this.checkClosed();
-
-        String[] result = this.redisClient.sendCommand(sql);
-        this.resultSet = new RedisResultSet(result, this);
-
+        this.resultSet = executeQuery(sql);
         return true;
     }
 

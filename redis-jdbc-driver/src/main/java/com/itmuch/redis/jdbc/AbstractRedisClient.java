@@ -1,7 +1,9 @@
 package com.itmuch.redis.jdbc;
 
+import com.itmuch.redis.jdbc.conf.Feature;
 import com.itmuch.redis.jdbc.conf.Hint;
 import com.itmuch.redis.jdbc.conf.Op;
+import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Protocol;
 import redis.clients.jedis.util.SafeEncoder;
 
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public abstract class AbstractRedisClient implements RedisClient {
@@ -19,6 +22,16 @@ public abstract class AbstractRedisClient implements RedisClient {
     public String[] sendCommand(String sql) throws SQLException {
         try {
             Op op = Utils.parseSql(sql, null);
+
+            String firstParam = op.getParams().length == 0 ? null : op.getParams()[0];
+            if (op.getCommand().equals("USE") && firstParam != null) { //DB switch
+                select(Integer.valueOf(op.getParams()[0]));
+                return new String[]{op.getParams()[0]};
+            } else if (op.getCommand().equals("SELECT") && StringUtils.equalsIgnoreCase(firstParam, "DB_NAME()")) {
+                return new String[]{String.valueOf(this.getDbIndex())};
+            } else if (op.getCommand().equals("SELECT") && StringUtils.equalsIgnoreCase(firstParam, "keep_alive")) { // for IDEA database tool only
+                op = new Op(sql, null, "PING", new String[0]);
+            }
 
             Object result = this.sendCommand(op);
 
@@ -63,7 +76,7 @@ public abstract class AbstractRedisClient implements RedisClient {
         } else if (originResult instanceof Collection) {
             List<byte[]> convertedList = Utils.convert((Collection<?>) originResult, new ArrayList<>());
             decodedResult = convertedList.stream()
-                    .map(SafeEncoder::encode)
+                    .map(AbstractRedisClient::nullSafeEncode)
                     .toArray(String[]::new);
         } else {
             LOGGER.log("cannot decode result. originResult = %s", originResult);
@@ -73,5 +86,9 @@ public abstract class AbstractRedisClient implements RedisClient {
         LOGGER.log("decode success. sql = %s, originResult = %s, decodedResult = %s",
                 sql, originResult, Utils.toList(decodedResult));
         return decodedResult;
+    }
+
+    private static String nullSafeEncode(byte[] bytes) {
+        return bytes == null ? null : SafeEncoder.encode(bytes);
     }
 }

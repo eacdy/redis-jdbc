@@ -1,12 +1,19 @@
 package com.itmuch.redis.jdbc.redis;
 
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.DriverPropertyInfo;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.Map;
+import java.util.Properties;
+
 import com.itmuch.redis.jdbc.Logger;
 import com.itmuch.redis.jdbc.RedisConnection;
+import com.itmuch.redis.jdbc.conf.Feature;
 import com.itmuch.redis.jdbc.conf.RedisConnectionInfo;
 import redis.clients.jedis.Jedis;
-
-import java.sql.*;
-import java.util.Properties;
 
 public class RedisDriver implements Driver {
     private final static Logger LOGGER = new Logger(RedisDriver.class);
@@ -59,7 +66,7 @@ public class RedisDriver implements Driver {
 //                jedis.clientSetname(clientName);
 //            }
 
-            return new RedisConnection(new JedisRedisClient(jedis), dbIndex + "", info);
+            return new RedisConnection(new JedisRedisClient(jedis, dbIndex, Feature.fromProperties(info)), info);
         } catch (Exception e) {
             LOGGER.log("Cannot init RedisConnection %s", e);
             throw new SQLException("Cannot init RedisConnection", e);
@@ -73,7 +80,10 @@ public class RedisDriver implements Driver {
 
     @Override
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
-        return new DriverPropertyInfo[0];
+        Map<Feature, Boolean> settings = Feature.fromProperties(info);
+        return settings.entrySet().stream().map(entry -> {
+            return new DriverPropertyInfo(entry.getKey().getPropName(), entry.getValue().toString());
+        }).toArray(DriverPropertyInfo[]::new);
     }
 
     @Override
